@@ -248,7 +248,7 @@ body {
 <div class="page-title">★ VIBEDEX v3.0 ★</div>
 <div class="page-sub">What kind of vibe coder are you?</div>
 
-<div class="toast" id="toast">✓ COPIED TO CLIPBOARD!</div>
+<div class="toast" id="toast"></div>
 
 <div class="wrap">
   <div class="top-bar">
@@ -703,24 +703,54 @@ function showResult(key){
   setTimeout(()=>{ document.querySelectorAll('.stat-bar-fill').forEach(el=>{ el.style.width=el.dataset.val+'%'; }); },300);
 }
 
-function getShareText(){
-  const arch=ARCHETYPES[resultKey];
-  const pageUrl=window.location.href;
-  return `I just took the Vibe Coder Archetype quiz 🎮\n\nI'm ${arch.label.toUpperCase()} ${arch.types[0].c==='t-vibe'?'✨':'💥'}\n\n${arch.catchphrase}\n\nWhat's yours? → ${pageUrl}\n\n#VibeCoder #BuildInPublic`;
+const SITE_URL = 'https://pucheepoop.github.io/whatsyourvibearchetype/';
+
+const SHARE_OPENERS = {
+  whisperer: "I don't write code. I summon it. 🧙",
+  chaos:     "I push to prod the way other people breathe. 💥",
+  aesthetic: "My app is a visual masterpiece that does nothing. ✨",
+  goblin:    "Token limits are a conspiracy I choose not to believe. 🪄",
+  iterator:  "Everything is 95% done. Nothing is shipped. 🔄"
+};
+
+function getShareText(platform){
+  const arch = ARCHETYPES[resultKey];
+  const opener = SHARE_OPENERS[resultKey];
+  if(platform === 'twitter'){
+    return `${opener}\n\nI'm ${arch.label.toUpperCase()} on the Vibe Coder Archetype quiz.\n\n${arch.catchphrase}\n\nWhat are you? → ${SITE_URL}\n\n#VibeCoder #BuildInPublic #AI`;
+  }
+  if(platform === 'linkedin'){
+    return `I took a 5-question quiz to find out what kind of vibe coder I am 🎮\n\nResult: ${arch.label.toUpperCase()}\n\n${opener}\n\n${arch.catchphrase}\n\nIf you build with AI, you'll see yourself in one of these archetypes.\n\nTake it here → ${SITE_URL}\n\n#VibeCoding #BuildInPublic #AITools #SoftwareDevelopment`;
+  }
+  // copy
+  return `I'm ${arch.label.toUpperCase()} on the Vibe Coder Archetype quiz 🎮\n\n${opener}\n\n${arch.catchphrase}\n\nFind yours → ${SITE_URL}\n\n#VibeCoder #BuildInPublic`;
 }
 
 function shareTwitter(){
-  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText())}`,'_blank');
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText('twitter'))}`,'_blank');
 }
 function shareLinkedIn(){
-  window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(getShareText())}`,'_blank');
+  window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(getShareText('linkedin'))}`,'_blank');
 }
 function copyText(){
-  navigator.clipboard.writeText(getShareText()).then(()=>{
-    const t=document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'),2200);
+  navigator.clipboard.writeText(getShareText('copy')).then(()=>{
+    showToast('✓ COPIED! NOW GO PASTE IT.');
+  }).catch(()=>{
+    // fallback for browsers that block clipboard
+    const ta = document.createElement('textarea');
+    ta.value = getShareText('copy');
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('✓ COPIED! NOW GO PASTE IT.');
   });
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2400);
 }
 function retry(){
   answers={};currentQ=0;resultKey=null;

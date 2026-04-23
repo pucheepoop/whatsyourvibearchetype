@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VibeDex — What Kind of Vibe Coder Are You?</title>
+<meta property="og:title" content="VibeDex — What Kind of Vibe Coder Are You?">
+<meta property="og:description" content="Take the quiz. Find your archetype. Share your shame.">
+<meta name="twitter:card" content="summary">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #1a1a2e;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px 40px;
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* Page header */
+.page-title {
+  font-size: 10px;
+  color: #9bbc0f;
+  text-align: center;
+  margin-bottom: 6px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px rgba(155,188,15,0.4);
+}
+.page-sub {
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  color: #4a6a05;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* GAMEBOY WRAP */
+.wrap {
+  background: linear-gradient(160deg, #cc0000 60%, #aa0000 100%);
+  border-radius: 16px 16px 44px 16px;
+  padding: 20px 20px 16px;
+  width: 100%;
+  max-width: 520px;
+  border: 4px solid #660000;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.top-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; position: relative; z-index: 1; }
+.big-eye { width: 44px; height: 44px; border-radius: 50%; background: #4af; border: 4px solid #fff; position: relative; flex-shrink: 0; }
+.big-eye::after { content: ''; position: absolute; top: 8px; left: 8px; width: 12px; height: 12px; background: #fff; border-radius: 50%; }
+.lights { display: flex; gap: 5px; }
+.lt { width: 12px; height: 12px; border-radius: 50%; border: 2px solid rgba(0,0,0,.25); }
+.lr { background: #ff5555; } .ly { background: #ffdd00; } .lg { background: #55dd55; }
+.title-tag { margin-left: auto; text-align: right; font-size: 6px; color: #ffcccc; line-height: 2; text-shadow: 1px 1px 0 #660000; }
+
+/* SCREEN */
+.screen-shell { background: #111; border-radius: 8px; border: 6px solid #222; padding: 4px; margin-bottom: 10px; position: relative; z-index: 1; }
+.screen { background: #9bbc0f; border-radius: 4px; padding: 16px 14px 12px; min-height: 340px; position: relative; overflow: hidden; }
+
+/* PROGRESS */
+.progress-bar { display: flex; gap: 4px; margin-bottom: 14px; }
+.prog-pip { height: 6px; flex: 1; background: #4a6a05; border-radius: 2px; transition: background .3s; }
+.prog-pip.done { background: #1a3a0a; }
+
+/* QUESTION */
+.q-card { animation: fadeUp .3s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.q-num { font-size: 6px; color: #4a6a05; margin-bottom: 6px; }
+.q-text { font-size: 8px; color: #1a3a0a; line-height: 2; margin-bottom: 14px; }
+.options { display: flex; flex-direction: column; gap: 6px; }
+.opt {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  background: #c8e06a;
+  border: 2px solid #1a3a0a;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: #1a3a0a;
+  text-align: left;
+  border-radius: 2px;
+  line-height: 1.7;
+  transition: background .12s, transform .1s;
+}
+.opt:hover { background: #d8f07a; transform: translateX(3px); }
+.opt.selected { background: #1a3a0a; color: #9bbc0f; }
+
+/* DRAMA OVERLAY */
+.drama-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: #1a3a0a;
+  border-radius: 4px;
+  z-index: 10;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.drama-overlay.active { display: flex; }
+.drama-avatar { image-rendering: pixelated; width: 96px; height: 120px; animation: dramaBounce .55s ease-in-out infinite alternate; }
+@keyframes dramaBounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+.drama-shadow-sm { width: 38px; height: 6px; background: rgba(155,188,15,0.2); border-radius: 50%; margin-top: -4px; animation: shadowPulseSm .55s ease-in-out infinite alternate; }
+@keyframes shadowPulseSm { 0% { width: 38px; opacity: .2; } 100% { width: 26px; opacity: .08; } }
+.drama-bars { display: flex; flex-direction: column; gap: 5px; width: 150px; margin-top: 4px; }
+.drama-bar { height: 5px; background: #4a6a05; position: relative; overflow: hidden; border-radius: 1px; }
+.drama-bar::after { content: ''; position: absolute; inset: 0; background: #9bbc0f; animation: scanBar .65s ease infinite; }
+@keyframes scanBar { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+.drama-line1 { font-size: 7px; color: #9bbc0f; animation: blinkText .45s infinite; text-align: center; }
+@keyframes blinkText { 50% { opacity: 0; } }
+.drama-line2 { font-size: 5px; color: #4a6a05; text-align: center; }
+.drama-pips { display: flex; gap: 8px; }
+.drama-pip { width: 8px; height: 8px; border-radius: 50%; background: #4a6a05; transition: background .3s; }
+.drama-pip.lit { background: #9bbc0f; }
+
+/* REVEAL */
+.reveal-view { display: none; animation: fadeUp .4s ease; }
+.reveal-hero {
+  display: flex; flex-direction: column; align-items: center;
+  margin-bottom: 10px;
+  background: #8bac0f;
+  border: 2px solid #4a6a05;
+  border-radius: 3px;
+  padding: 10px 8px 6px;
+  position: relative;
+  overflow: hidden;
+}
+.reveal-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(0,0,0,0.04) 8px, rgba(0,0,0,0.04) 9px);
+  pointer-events: none;
+}
+.avatar-stage { position: relative; width: 128px; height: 140px; margin-bottom: 4px; }
+.avatar-canvas {
+  image-rendering: pixelated;
+  width: 128px; height: 140px;
+  position: absolute; bottom: 0; left: 0;
+  animation: habboJump 0.7s ease-in-out infinite alternate;
+}
+@keyframes habboJump {
+  0%   { transform: translateY(0px) scaleX(1); }
+  40%  { transform: translateY(-14px) scaleX(1.04); }
+  100% { transform: translateY(-18px) scaleX(0.96); }
+}
+.avatar-shadow {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 52px; height: 8px;
+  background: rgba(26,58,10,0.25);
+  border-radius: 50%;
+  animation: shadowPulse 0.7s ease-in-out infinite alternate;
+}
+@keyframes shadowPulse {
+  0%   { width: 52px; opacity: 0.25; }
+  100% { width: 36px; opacity: 0.12; }
+}
+.reveal-archetype-label { font-size: 5px; color: #4a6a05; margin-bottom: 3px; }
+.reveal-name { font-size: 9px; color: #1a3a0a; line-height: 1.8; text-align: center; margin-bottom: 6px; }
+.type-row { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; margin-bottom: 8px; }
+.tbadge { font-size: 5px; padding: 2px 7px; color: #fff; font-family: 'Press Start 2P', monospace; border-radius: 1px; }
+.t-chaos  { background: #f08030; } .t-flow  { background: #6890f0; }
+.t-grind  { background: #78c850; color: #1a3a0a; } .t-zap { background: #c8a000; }
+.t-vibe   { background: #f85888; } .t-dark  { background: #705848; }
+.t-ghost  { background: #705898; } .t-dragon { background: #7038f8; }
+.t-ice    { background: #5aabab; }
+
+.reveal-desc { font-family: 'VT323', monospace; font-size: 15px; color: #1a3a0a; line-height: 1.4; margin-bottom: 6px; }
+.reveal-catch { font-family: 'VT323', monospace; font-size: 14px; color: #4a6a05; border-left: 3px solid #1a3a0a; padding-left: 6px; margin-bottom: 10px; }
+
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px; }
+.stat-item { background: #c8e06a; border: 1.5px solid #1a3a0a; padding: 5px 7px; }
+.stat-name { font-size: 4px; color: #4a6a05; margin-bottom: 3px; }
+.stat-bar-bg { background: #4a6a05; height: 5px; }
+.stat-bar-fill { height: 100%; background: #1a3a0a; transition: width .9s ease; }
+
+/* SHARE */
+.share-area { background: #1a3a0a; border-radius: 3px; padding: 10px; }
+.share-label { font-size: 5px; color: #9bbc0f; margin-bottom: 7px; text-align: center; }
+.share-btns { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
+.share-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5px; padding: 7px 10px;
+  border: 2px solid; cursor: pointer; border-radius: 2px;
+  transition: opacity .15s, transform .1s;
+}
+.share-btn:active { transform: scale(.95); }
+.sb-tw { background: #1DA1F2; color: #fff; border-color: #0d8fd8; }
+.sb-li { background: #0077b5; color: #fff; border-color: #005f8a; }
+.sb-cp { background: #9bbc0f; color: #1a3a0a; border-color: #4a6a05; }
+.sb-retry { background: transparent; color: #9bbc0f; border-color: #9bbc0f; }
+
+/* GAMEBOY CONTROLS */
+.hinge { height: 8px; background: #aa0000; margin: 10px 0; display: flex; align-items: center; padding: 0 20px; gap: 8px; position: relative; z-index: 1; }
+.hinge-dot { width: 6px; height: 6px; background: #880000; border-radius: 50%; }
+.bottom { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1; }
+.dpad { display: grid; grid-template-columns: repeat(3, 18px); grid-template-rows: repeat(3, 18px); gap: 2px; }
+.dp { background: #222; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 7px; color: #555; }
+.dp-c { background: #333; border-radius: 50%; }
+.ab { display: flex; gap: 8px; align-items: flex-end; }
+.a-b, .b-b { width: 28px; height: 28px; border-radius: 50%; border: 3px solid rgba(0,0,0,.3); font-family: 'Press Start 2P', monospace; font-size: 7px; color: #fff; display: flex; align-items: center; justify-content: center; }
+.a-b { background: #cc2244; } .b-b { background: #224488; margin-bottom: 8px; }
+.ss-row { display: flex; gap: 6px; }
+.ss { background: #555; border: 2px solid #222; border-radius: 8px; width: 28px; height: 10px; display: flex; align-items: center; justify-content: center; font-size: 4px; color: #999; font-family: 'Press Start 2P', monospace; }
+
+.scan { background: #4a6a05; text-align: center; padding: 4px; font-size: 5px; color: #9bbc0f; border-top: 2px solid #6a8c09; margin-top: 6px; border-radius: 0 0 2px 2px; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: #1a3a0a; color: #9bbc0f; padding: 10px 18px;
+  font-size: 7px; border: 2px solid #9bbc0f; border-radius: 4px;
+  display: none; z-index: 9999;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.toast.show { display: block; animation: toastIn .25s ease; }
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+/* FOOTER */
+.footer {
+  margin-top: 20px;
+  font-size: 6px;
+  color: #4a6a05;
+  text-align: center;
+  line-height: 2.5;
+}
+.footer a { color: #9bbc0f; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="page-title">★ VIBEDEX v3.0 ★</div>
+<div class="page-sub">What kind of vibe coder are you?</div>
+
+<div class="toast" id="toast">✓ COPIED TO CLIPBOARD!</div>
+
+<div class="wrap">
+  <div class="top-bar">
+    <div class="big-eye"></div>
+    <div class="lights"><div class="lt lr"></div><div class="lt ly"></div><div class="lt lg"></div></div>
+    <div class="title-tag">VIBEDEX v3.0<br>CODER QUIZ</div>
+  </div>
+
+  <div class="screen-shell">
+    <div class="screen" id="screen">
+
+      <!-- DRAMA OVERLAY -->
+      <div class="drama-overlay" id="drama">
+        <div class="drama-pips" id="dramaPips">
+          <div class="drama-pip"></div><div class="drama-pip"></div><div class="drama-pip"></div>
+          <div class="drama-pip"></div><div class="drama-pip"></div>
+        </div>
+        <canvas id="dramaCanvas" class="drama-avatar" width="96" height="120"></canvas>
+        <div class="drama-shadow-sm"></div>
+        <div class="drama-bars">
+          <div class="drama-bar"></div><div class="drama-bar"></div><div class="drama-bar"></div>
+        </div>
+        <div class="drama-line1" id="dramaLine1">SCANNING...</div>
+        <div class="drama-line2" id="dramaLine2">loading vibe data</div>
+      </div>
+
+      <!-- QUIZ -->
+      <div id="quizView">
+        <div class="progress-bar" id="progressBar"></div>
+        <div id="questionArea"></div>
+      </div>
+
+      <!-- REVEAL -->
+      <div class="reveal-view" id="revealView">
+        <div class="reveal-hero">
+          <div class="avatar-stage">
+            <canvas id="habboCanvas" class="avatar-canvas" width="128" height="140"></canvas>
+            <div class="avatar-shadow"></div>
+          </div>
+          <div class="reveal-archetype-label">► YOUR VIBE CODER ARCHETYPE</div>
+          <div class="reveal-name" id="revealName"></div>
+          <div class="type-row" id="revealTypes"></div>
+        </div>
+        <div class="reveal-desc" id="revealDesc" style="margin-bottom:6px;"></div>
+        <div class="reveal-catch" id="revealCatch"></div>
+        <div class="stat-grid" id="revealStats"></div>
+        <div class="share-area">
+          <div class="share-label">► SHARE YOUR ARCHETYPE</div>
+          <div class="share-btns">
+            <button class="share-btn sb-tw" onclick="shareTwitter()">𝕏 TWEET IT</button>
+            <button class="share-btn sb-li" onclick="shareLinkedIn()">in POST IT</button>
+            <button class="share-btn sb-cp" onclick="copyText()">⎘ COPY TEXT</button>
+            <button class="share-btn sb-retry" onclick="retry()">↺ RETRY</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="scan" id="scanLine">► WHAT KIND OF VIBE CODER ARE YOU? ◄</div>
+  </div>
+
+  <div class="hinge"><div class="hinge-dot"></div><div class="hinge-dot"></div><div class="hinge-dot"></div></div>
+  <div class="bottom">
+    <div class="dpad">
+      <div></div><div class="dp">▲</div><div></div>
+      <div class="dp">◄</div><div class="dp dp-c"></div><div class="dp">►</div>
+      <div></div><div class="dp">▼</div><div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+      <div class="ss-row"><div class="ss">SELECT</div><div class="ss">START</div></div>
+      <div style="font-size:4px;color:#ffaaaa;font-family:'Press Start 2P',monospace;">VIBE CODER CO.</div>
+    </div>
+    <div class="ab"><div class="b-b">B</div><div class="a-b">A</div></div>
+  </div>
+</div>
+
+<div class="footer">
+  made with claude · #vibecoder · share &amp; tag a friend
+</div>
+
+<script>
+const S = 4;
+function px(ctx, x, y, w, h, col) {
+  if (!col || col === 'transparent') return;
+  ctx.fillStyle = col; ctx.fillRect(x*S, y*S, w*S, h*S);
+}
+
+const AVATARS = {
+  whisperer: (ctx) => {
+    const skin='#f5c5a3',skinD='#d4a882',skinS='#ffdfc0';
+    const hair='#9955dd',hairD='#6622aa',hairS='#bb88ff';
+    const robe='#221144',robeD='#110a22',robeL='#332266';
+    const trim='#aa88ff',gold='#ffd700';
+    const eye='#2a1a4a',white='#fff',mouth='#c07060';
+    const staff='#8855cc',orb='#dd88ff',orbG='#fff';
+    px(ctx,18,5,1,26,staff); px(ctx,17,5,1,26,hairD);
+    px(ctx,18,4,2,2,orb); px(ctx,19,4,1,2,orbG);
+    px(ctx,6,16,14,18,robe);
+    px(ctx,5,17,1,16,robeL); px(ctx,20,17,1,16,robeL);
+    px(ctx,6,16,1,18,robeL); px(ctx,19,16,1,18,robeD);
+    px(ctx,11,16,3,18,trim);
+    px(ctx,6,33,14,1,trim); px(ctx,7,34,12,1,robeL);
+    px(ctx,2,18,4,10,robe); px(ctx,20,18,4,10,robe);
+    px(ctx,2,18,1,10,robeL); px(ctx,23,18,1,10,robeD);
+    px(ctx,2,27,3,3,skin); px(ctx,20,27,3,3,skin);
+    px(ctx,12,20,1,3,gold); px(ctx,11,21,3,1,gold);
+    px(ctx,5,9,2,14,hair); px(ctx,19,9,2,14,hair);
+    px(ctx,5,9,1,14,hairS); px(ctx,20,9,1,14,hairD);
+    px(ctx,7,5,11,5,hair);
+    px(ctx,6,6,1,4,hairS); px(ctx,17,6,1,4,hairD);
+    px(ctx,7,8,11,8,skin);
+    px(ctx,7,8,1,8,skinS); px(ctx,17,8,1,8,skinD);
+    px(ctx,6,10,1,4,skin); px(ctx,18,10,1,4,skin);
+    px(ctx,8,11,3,2,eye); px(ctx,14,11,3,2,eye);
+    px(ctx,8,11,1,1,white); px(ctx,14,11,1,1,white);
+    px(ctx,8,10,3,1,hairD); px(ctx,14,10,3,1,hairD);
+    px(ctx,11,13,2,1,skinD);
+    px(ctx,9,14,5,1,mouth); px(ctx,13,13,1,1,mouth);
+    px(ctx,8,15,9,2,hairS); px(ctx,9,16,7,1,hair);
+    px(ctx,7,5,11,2,robe); px(ctx,9,3,7,3,robe); px(ctx,11,1,5,3,robe);
+    px(ctx,9,3,1,3,robeL); px(ctx,15,3,1,3,robeD);
+    px(ctx,7,6,11,1,trim);
+    px(ctx,12,2,1,3,gold); px(ctx,11,3,3,1,gold);
+    px(ctx,10,15,5,2,skin);
+  },
+  chaos: (ctx) => {
+    const skin='#f5c5a3',skinD='#d4a882',skinS='#ffdfc0';
+    const hair='#ff3300',hairD='#cc2200';
+    const flm1='#ff6600',flm2='#ffaa00',flm3='#ffdd00';
+    const shirt='#cc0000',shirtD='#880000',shirtL='#ee2222';
+    const pants='#222233',pantsD='#111122';
+    const shoes='#111',shoesL='#333';
+    const eye='#111',white='#fff',mouth='#cc5533';
+    const badge='#ffdd00';
+    const fire1='#ff4400',fire2='#ff8800';
+    px(ctx,8,0,3,2,flm3); px(ctx,13,0,3,2,flm3);
+    px(ctx,6,1,4,3,flm2); px(ctx,14,1,4,3,flm2);
+    px(ctx,5,2,3,4,flm1); px(ctx,16,2,3,4,flm1);
+    px(ctx,7,1,10,4,fire1);
+    px(ctx,8,0,8,3,fire2);
+    px(ctx,9,0,5,2,flm3);
+    px(ctx,10,0,3,1,flm3);
+    px(ctx,7,4,11,3,hair); px(ctx,6,5,1,3,hair); px(ctx,18,5,1,3,hairD);
+    px(ctx,7,7,11,9,skin);
+    px(ctx,7,7,1,9,skinS); px(ctx,17,7,1,9,skinD);
+    px(ctx,6,9,1,5,skin); px(ctx,18,9,1,5,skin);
+    px(ctx,8,10,3,2,eye); px(ctx,13,10,3,2,eye);
+    px(ctx,8,10,1,1,white); px(ctx,13,10,1,1,white);
+    px(ctx,8,9,3,1,hairD); px(ctx,13,9,3,1,hairD);
+    px(ctx,8,9,1,2,hairD); px(ctx,15,9,1,2,hairD);
+    px(ctx,11,13,2,1,skinD);
+    px(ctx,8,14,8,1,mouth); px(ctx,9,15,6,1,mouth);
+    px(ctx,9,14,1,1,white); px(ctx,12,14,2,1,white);
+    px(ctx,10,15,5,2,skin);
+    px(ctx,6,17,13,11,shirt);
+    px(ctx,6,17,1,11,shirtL); px(ctx,18,17,1,11,shirtD);
+    px(ctx,9,20,7,4,badge); px(ctx,10,21,5,2,badge);
+    px(ctx,2,17,5,9,shirt); px(ctx,18,17,5,9,shirt);
+    px(ctx,2,17,1,9,shirtL); px(ctx,22,17,1,9,shirtD);
+    px(ctx,2,24,4,4,skin); px(ctx,19,23,4,4,skin);
+    px(ctx,7,28,6,8,pants); px(ctx,13,28,6,8,pants); px(ctx,12,28,2,8,pantsD);
+    px(ctx,6,35,7,4,shoes); px(ctx,13,35,7,4,shoes);
+    px(ctx,6,35,1,4,shoesL); px(ctx,19,35,1,4,shoesL);
+    px(ctx,7,38,4,2,fire1); px(ctx,15,38,4,2,fire1);
+    px(ctx,8,39,2,1,fire2); px(ctx,16,39,2,1,fire2);
+  },
+  aesthetic: (ctx) => {
+    const skin='#ffe0c0',skinD='#d4b090',skinS='#fff0e0';
+    const hair='#f8dda0',hairD='#d4aa60',hairS='#fffce0';
+    const shirt='#ffd6ec',shirtD='#e0a0cc',shirtL='#fff0f8';
+    const pants='#d4b0d0',pantsD='#aa80a8';
+    const shoes='#cc99bb',shoesL='#eeccdd';
+    const eye='#443344',white='#fff',mouth='#e09090';
+    const sparkle='#fff8aa',sparkleB='#ffcc00';
+    const blush='#ffb0b0';
+    px(ctx,5,7,3,22,hair); px(ctx,17,7,3,22,hair);
+    px(ctx,5,7,1,22,hairS); px(ctx,19,7,1,22,hairD);
+    px(ctx,7,4,11,5,hair); px(ctx,6,5,1,4,hairS); px(ctx,17,5,1,4,hairD);
+    px(ctx,8,5,2,10,hairS); px(ctx,13,5,1,10,hairS);
+    px(ctx,7,7,11,9,skin);
+    px(ctx,7,7,1,9,skinS); px(ctx,17,7,1,9,skinD);
+    px(ctx,6,9,1,5,skin); px(ctx,18,9,1,5,skin);
+    px(ctx,8,10,3,3,eye); px(ctx,13,10,3,3,eye);
+    px(ctx,8,10,1,1,white); px(ctx,13,10,1,1,white);
+    px(ctx,9,10,1,1,'#6644aa'); px(ctx,14,10,1,1,'#6644aa');
+    px(ctx,8,11,1,1,white); px(ctx,13,11,1,1,white);
+    px(ctx,8,10,4,1,'#221122'); px(ctx,13,10,4,1,'#221122');
+    px(ctx,7,13,2,1,blush); px(ctx,15,13,2,1,blush);
+    px(ctx,11,12,2,1,skinD);
+    px(ctx,10,14,4,1,mouth); px(ctx,10,15,1,1,mouth); px(ctx,13,15,1,1,mouth);
+    px(ctx,10,15,5,2,skin);
+    px(ctx,7,17,11,10,shirt);
+    px(ctx,7,17,1,10,shirtL); px(ctx,17,17,1,10,shirtD);
+    px(ctx,9,17,2,2,'#ff99cc'); px(ctx,13,17,2,2,'#ff99cc'); px(ctx,11,18,3,1,'#ff99cc');
+    px(ctx,4,17,4,9,shirt); px(ctx,17,17,4,9,shirt);
+    px(ctx,4,17,1,9,shirtL); px(ctx,20,17,1,9,shirtD);
+    px(ctx,4,25,3,3,skin); px(ctx,18,25,3,3,skin);
+    px(ctx,4,27,3,4,'#333'); px(ctx,5,27,2,3,'#88ccff');
+    px(ctx,5,27,15,9,pants); px(ctx,4,28,1,8,pantsD); px(ctx,20,28,1,8,pantsD);
+    px(ctx,5,27,1,9,'#e8c0e0'); px(ctx,19,27,1,9,pantsD);
+    px(ctx,5,35,15,1,'#cc99bb');
+    px(ctx,6,36,6,3,shoes); px(ctx,14,36,6,3,shoes);
+    px(ctx,11,37,2,2,shoesL); px(ctx,16,39,1,2,shoesL);
+    px(ctx,2,8,1,3,sparkle); px(ctx,3,9,3,1,sparkle);
+    px(ctx,20,6,1,3,sparkleB); px(ctx,19,7,3,1,sparkleB);
+    px(ctx,1,22,1,3,sparkle); px(ctx,2,23,3,1,sparkle);
+    px(ctx,21,20,1,3,sparkle); px(ctx,20,21,3,1,sparkle);
+  },
+  goblin: (ctx) => {
+    const skin='#aada66',skinD='#88bb44',skinS='#ccee88';
+    const hair='#336622',hairD='#224411',hairS='#55aa33';
+    const shirt='#1a3a0a',shirtD='#0a1a04',shirtL='#2a5a14';
+    const pants='#2a4a1a',pantsD='#1a2a0a';
+    const shoes='#111',shoesL='#333';
+    const eye='#88ff44',eyeD='#336622',white='#fff',mouth='#66aa33';
+    const glow='#88ff44';
+    const laptop='#333',screen='#00ff88',screenG='#aaffcc';
+    const gear='#8a8a6a';
+    px(ctx,5,9,2,6,skin); px(ctx,5,9,1,6,skinS);
+    px(ctx,18,9,2,6,skin); px(ctx,19,9,1,6,skinD);
+    px(ctx,4,9,2,3,skin); px(ctx,19,9,2,3,skin);
+    px(ctx,7,4,11,5,hair);
+    px(ctx,5,5,3,5,hair); px(ctx,17,5,3,5,hair);
+    px(ctx,6,3,4,4,hair); px(ctx,15,3,4,4,hair);
+    px(ctx,9,2,7,4,hair);
+    px(ctx,7,4,1,5,hairS); px(ctx,17,4,1,5,hairD);
+    px(ctx,7,8,11,9,skin);
+    px(ctx,7,8,1,9,skinS); px(ctx,17,8,1,9,skinD);
+    px(ctx,6,9,1,7,skin); px(ctx,18,9,1,7,skin);
+    px(ctx,11,13,3,3,skinD); px(ctx,12,12,1,4,skinD); px(ctx,13,14,1,2,skinD);
+    px(ctx,8,10,3,2,eye); px(ctx,13,10,3,2,eye);
+    px(ctx,9,10,2,1,glow); px(ctx,14,10,2,1,glow);
+    px(ctx,8,10,1,1,white); px(ctx,13,10,1,1,white);
+    px(ctx,8,9,4,1,hairD); px(ctx,13,9,4,1,hairD);
+    px(ctx,8,14,8,1,eyeD); px(ctx,9,15,6,1,eyeD);
+    px(ctx,9,14,1,1,white); px(ctx,11,14,2,1,white); px(ctx,14,14,1,1,white);
+    px(ctx,10,16,5,2,skin);
+    px(ctx,6,18,13,11,shirt);
+    px(ctx,6,18,1,11,shirtL); px(ctx,18,18,1,11,shirtD);
+    px(ctx,9,23,7,5,'#224410'); px(ctx,10,24,5,3,'#1a3408');
+    px(ctx,2,18,5,10,shirt); px(ctx,18,18,5,10,shirt);
+    px(ctx,2,18,1,10,shirtL); px(ctx,22,18,1,10,shirtD);
+    px(ctx,2,27,4,3,skin); px(ctx,19,27,4,3,skin);
+    px(ctx,5,30,15,8,laptop); px(ctx,6,31,13,6,screen);
+    px(ctx,6,31,4,2,screenG);
+    px(ctx,7,32,8,1,'#006633'); px(ctx,7,33,5,1,'#006633'); px(ctx,7,34,10,1,'#006633');
+    px(ctx,7,29,5,7,pants); px(ctx,13,29,5,7,pants); px(ctx,12,29,2,7,pantsD);
+    px(ctx,6,35,7,4,shoes); px(ctx,13,35,7,4,shoes);
+    px(ctx,6,35,1,4,shoesL); px(ctx,19,35,1,4,shoesL);
+    px(ctx,0,12,4,4,gear); px(ctx,1,11,2,1,gear); px(ctx,1,15,2,1,gear); px(ctx,0,13,1,2,gear); px(ctx,3,13,1,2,gear);
+    px(ctx,21,16,4,4,gear); px(ctx,22,15,2,1,gear); px(ctx,22,19,2,1,gear); px(ctx,21,17,1,2,gear); px(ctx,24,17,1,2,gear);
+  },
+  iterator: (ctx) => {
+    const skin='#f5c5a3',skinD='#d4a882',skinS='#ffdfc0';
+    const hair='#334488',hairD='#223366',hairS='#6688cc';
+    const shirt='#2244aa',shirtD='#112288',shirtL='#4466cc';
+    const pants='#1a2244',pantsD='#0a1122';
+    const shoes='#223366',shoesL='#4455aa';
+    const eye='#1a2244',white='#fff',mouth='#c07060';
+    const hp='#334488',hpD='#223366',hpL='#aabbff';
+    const sticky='#fffaaa',stickyD='#dddd88';
+    const mug='#cc8844',mugD='#aa6622',steam='#c8e06a';
+    px(ctx,5,7,2,8,hp); px(ctx,18,7,2,8,hp);
+    px(ctx,5,7,1,8,hpL); px(ctx,19,7,1,8,hpD);
+    px(ctx,6,7,10,2,hp);
+    px(ctx,5,12,3,4,hpD); px(ctx,17,12,3,4,hpD);
+    px(ctx,5,12,1,4,hpL); px(ctx,19,12,1,4,hpD);
+    px(ctx,7,5,11,4,hair);
+    px(ctx,6,6,2,4,hair); px(ctx,17,6,2,4,hair);
+    px(ctx,13,4,3,3,hair);
+    px(ctx,7,5,1,4,hairS); px(ctx,17,5,1,4,hairD);
+    px(ctx,7,8,11,9,skin);
+    px(ctx,7,8,1,9,skinS); px(ctx,17,8,1,9,skinD);
+    px(ctx,6,10,1,5,skin); px(ctx,18,10,1,5,skin);
+    px(ctx,8,13,3,1,skinD); px(ctx,13,13,3,1,skinD);
+    px(ctx,8,10,3,2,eye); px(ctx,13,10,3,2,eye);
+    px(ctx,8,10,1,1,white); px(ctx,13,10,1,1,white);
+    px(ctx,8,10,4,1,'#334488'); px(ctx,13,10,4,1,'#334488');
+    px(ctx,11,13,2,1,skinD);
+    px(ctx,9,15,6,1,mouth); px(ctx,9,14,1,1,mouth); px(ctx,14,14,1,1,mouth);
+    px(ctx,10,16,5,2,skin);
+    px(ctx,6,18,13,12,shirt);
+    px(ctx,6,18,1,12,shirtL); px(ctx,18,18,1,12,shirtD);
+    px(ctx,8,20,5,4,sticky); px(ctx,8,20,1,4,stickyD);
+    px(ctx,14,22,4,4,'#ffccaa'); px(ctx,14,22,1,4,'#dd9988');
+    px(ctx,9,21,3,1,'#aaa'); px(ctx,15,23,2,1,'#aaa');
+    px(ctx,2,18,5,10,shirt); px(ctx,18,18,5,10,shirt);
+    px(ctx,2,18,1,10,shirtL); px(ctx,22,18,1,10,shirtD);
+    px(ctx,2,27,4,3,skin);
+    px(ctx,1,26,4,5,mug); px(ctx,2,27,2,3,mugD);
+    px(ctx,0,27,1,3,mug);
+    px(ctx,2,26,2,1,steam); px(ctx,2,25,1,1,steam);
+    px(ctx,19,27,4,3,skin);
+    px(ctx,15,30,10,6,'#333'); px(ctx,16,31,8,4,'#4466cc');
+    px(ctx,16,31,3,2,shirtL);
+    px(ctx,7,30,5,6,pants); px(ctx,13,30,5,6,pants); px(ctx,12,30,2,6,pantsD);
+    px(ctx,6,35,7,4,shoes); px(ctx,13,35,7,4,shoes);
+    px(ctx,6,35,1,4,shoesL); px(ctx,19,35,1,4,shoesL);
+    px(ctx,0,8,5,4,sticky); px(ctx,0,9,4,2,stickyD); px(ctx,1,9,2,1,'#aaa');
+    px(ctx,21,5,5,4,'#ffccaa'); px(ctx,22,6,3,2,'#dd9988'); px(ctx,22,6,2,1,'#aaa');
+  }
+};
+
+function drawAvatar(canvas, key) {
+  canvas.width = 26*S; canvas.height = 40*S;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.imageSmoothingEnabled = false;
+  AVATARS[key](ctx);
+}
+
+function drawSilhouette(canvas, key) {
+  const tmp = document.createElement('canvas');
+  tmp.width = 26*S; tmp.height = 40*S;
+  drawAvatar(tmp, key);
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(tmp,0,0,tmp.width,tmp.height,0,0,canvas.width,canvas.height);
+  const id = ctx.getImageData(0,0,canvas.width,canvas.height);
+  for (let i=0;i<id.data.length;i+=4) {
+    if (id.data[i+3]>10){id.data[i]=154;id.data[i+1]=188;id.data[i+2]=15;}
+  }
+  ctx.putImageData(id,0,0);
+}
+
+const QUESTIONS = [
+  {q:"How do you abuse caffeine?",icon:"☕",opts:[
+    {text:"Pure cortisol. I don't need coffee.",scores:{aesthetic:2,iterator:2,whisperer:1,goblin:0,chaos:0}},
+    {text:"1-2 cups. I'm functional (allegedly).",scores:{whisperer:2,aesthetic:2,iterator:1,goblin:1,chaos:1}},
+    {text:"3-4 cups. One before the IDE opens.",scores:{goblin:3,chaos:2,iterator:2,whisperer:2,aesthetic:0}},
+    {text:"5+ cups. Coffee IS the standup.",scores:{chaos:4,goblin:3,iterator:2,whisperer:1,aesthetic:0}},
+    {text:"Energy drinks IV drip. I feel nothing.",scores:{chaos:5,goblin:3,iterator:1,whisperer:1,aesthetic:0}}
+  ]},
+  {q:"Your git commit message is usually...",icon:"📝",opts:[
+    {text:'"fixed"',scores:{chaos:4,goblin:2,iterator:1,whisperer:1,aesthetic:0}},
+    {text:'"wip wip wip"',scores:{iterator:5,aesthetic:2,chaos:1,goblin:1,whisperer:0}},
+    {text:'"claude wrote this, seems fine"',scores:{whisperer:5,goblin:3,chaos:0,aesthetic:0,iterator:1}},
+    {text:'"perfected the shadow (again)"',scores:{aesthetic:5,iterator:3,whisperer:0,goblin:0,chaos:0}},
+    {text:'"asdfghjkl"',scores:{chaos:5,goblin:1,iterator:2,whisperer:0,aesthetic:0}}
+  ]},
+  {q:"Bug report lands. You:",icon:"🐛",opts:[
+    {text:"Paste error + entire codebase into Claude.",scores:{goblin:5,whisperer:4,chaos:0,aesthetic:0,iterator:1}},
+    {text:"Deploy fix to prod. No tests. No regrets.",scores:{chaos:5,goblin:1,whisperer:0,aesthetic:0,iterator:0}},
+    {text:"Redesign the UI so the bug is invisible.",scores:{aesthetic:5,iterator:3,chaos:1,whisperer:0,goblin:0}},
+    {text:"Backlog it. Start a new feature.",scores:{iterator:4,chaos:2,aesthetic:1,whisperer:1,goblin:1}},
+    {text:"Prompt AI to build an app with no bugs.",scores:{whisperer:5,goblin:3,aesthetic:1,iterator:1,chaos:0}}
+  ]},
+  {q:"11:58pm. Where are you?",icon:"🌙",opts:[
+    {text:"Sleeping. I respect myself.",scores:{aesthetic:3,whisperer:2,iterator:1,goblin:0,chaos:0}},
+    {text:"Tweaking an animation nobody will see.",scores:{aesthetic:5,iterator:2,whisperer:1,goblin:0,chaos:0}},
+    {text:"Pasting my repo into Claude. 4th time.",scores:{goblin:5,whisperer:3,iterator:1,aesthetic:0,chaos:1}},
+    {text:"Pushing to prod. What could go wrong.",scores:{chaos:5,goblin:1,iterator:0,whisperer:0,aesthetic:0}},
+    {text:"'Quick refactor' that's now a full rewrite.",scores:{iterator:5,aesthetic:2,chaos:1,goblin:1,whisperer:1}}
+  ]},
+  {q:"How do you celebrate shipping?",icon:"🚀",opts:[
+    {text:"I don't ship. I iterate toward perfection.",scores:{iterator:5,aesthetic:3,whisperer:1,goblin:1,chaos:0}},
+    {text:"Tweet before checking if it works.",scores:{chaos:5,whisperer:2,goblin:1,iterator:1,aesthetic:0}},
+    {text:"Screenshot the UI. Those shadows tho.",scores:{aesthetic:5,whisperer:2,iterator:2,goblin:0,chaos:0}},
+    {text:"Ask Claude to write my launch post.",scores:{whisperer:5,goblin:4,aesthetic:1,iterator:1,chaos:0}},
+    {text:"Another coffee. Open v2 scope immediately.",scores:{goblin:3,chaos:3,iterator:4,whisperer:2,aesthetic:1}}
+  ]}
+];
+
+const ARCHETYPES = {
+  whisperer:{name:"THE PROMPT\nWHISPERER",label:"The Prompt Whisperer",
+    types:[{l:"VIBE",c:"t-vibe"},{l:"GHOST",c:"t-ghost"}],
+    desc:"You don't write code. You SUMMON it. Claude is your co-founder, therapist and senior engineer. Your GitHub is 90% .txt files named 'mega_prompt_FINAL_v7_use_THIS_one'. You haven't touched a for-loop in months and your app still works better than people who cried over it.",
+    catchphrase:'"I told Claude to write the backend. It did. We move."',
+    stats:[{n:"VIBE PWR",v:98},{n:"CHAOS IDX",v:40},{n:"SHIP RATE",v:75},{n:"CAFFEINE",v:28}]},
+  chaos:{name:"THE CHAOS\nDEPLOYER",label:"The Chaos Deployer",
+    types:[{l:"CHAOS",c:"t-chaos"},{l:"DRAGON",c:"t-dragon"}],
+    desc:"You push to prod the way other people breathe — constantly, without thinking. Tests are suggestions. Rollbacks are for cowards. You once hotfixed a live database mid-call and called it a vibe. The scary part? It worked. It always works. You are statistically cursed with luck.",
+    catchphrase:'"It worked on my machine. That IS production."',
+    stats:[{n:"VIBE PWR",v:60},{n:"CHAOS IDX",v:99},{n:"SHIP RATE",v:96},{n:"CAFFEINE",v:88}]},
+  aesthetic:{name:"THE AESTHETIC\nARCHITECT",label:"The Aesthetic Architect",
+    types:[{l:"ICE",c:"t-ice"},{l:"VIBE",c:"t-vibe"}],
+    desc:"Your app is a visual masterpiece that does approximately nothing. You spent 6 hours on a hover state 3 people will ever see. You've redesigned the landing page 4 times this sprint. Shipping feels like vandalism. You will never release anything. But what you have is BEAUTIFUL.",
+    catchphrase:'"The border-radius is 1px off. I cannot in good conscience ship this."',
+    stats:[{n:"VIBE PWR",v:97},{n:"CHAOS IDX",v:15},{n:"SHIP RATE",v:9},{n:"CAFFEINE",v:50}]},
+  goblin:{name:"THE CONTEXT\nGOBLIN",label:"The Context Goblin",
+    types:[{l:"DARK",c:"t-dark"},{l:"ZAP",c:"t-zap"}],
+    desc:"Token limits are a conspiracy you choose not to believe. You paste the entire repo, the README, three Stack Overflow threads and your Slack history into every prompt. Your Claude conversations look like crime scene evidence boards. And yet — it works. Because you gave context nobody else was unhinged enough to send.",
+    catchphrase:'"Let me paste the whole repo real quick. And the Slack history. And my notes app."',
+    stats:[{n:"VIBE PWR",v:72},{n:"CHAOS IDX",v:52},{n:"SHIP RATE",v:62},{n:"CAFFEINE",v:82}]},
+  iterator:{name:"THE INFINITE\nITERATOR",label:"The Infinite Iterator",
+    types:[{l:"FLOW",c:"t-flow"},{l:"GRIND",c:"t-grind"}],
+    desc:"Everything is 95% done. Nothing is shipped. You have 14 side projects, 200 browser tabs, and a Notion board that would make a therapist weep. Every time it's almost ready you see one more thing. One more refactor. The app is perfect inside your head and that is exactly where it will stay.",
+    catchphrase:'"It\'s basically done. I just need to clean up the code first."',
+    stats:[{n:"VIBE PWR",v:82},{n:"CHAOS IDX",v:30},{n:"SHIP RATE",v:7},{n:"CAFFEINE",v:72}]}
+};
+
+let answers={}, currentQ=0, resultKey=null;
+
+function buildProgress(){
+  const bar=document.getElementById('progressBar');
+  bar.innerHTML='';
+  QUESTIONS.forEach((_,i)=>{ const d=document.createElement('div'); d.className='prog-pip'+(i<currentQ?' done':''); bar.appendChild(d); });
+}
+
+function renderQuestion(){
+  buildProgress();
+  const q=QUESTIONS[currentQ];
+  document.getElementById('questionArea').innerHTML=`<div class="q-card"><div class="q-num">${q.icon} Q${currentQ+1} OF ${QUESTIONS.length}</div><div class="q-text">${q.q}</div><div class="options">${q.opts.map((o,i)=>`<button class="opt" onclick="pick(${i})">${String.fromCharCode(65+i)}. ${o.text}</button>`).join('')}</div></div>`;
+  document.getElementById('scanLine').textContent=`► Q${currentQ+1}/${QUESTIONS.length} — CHOOSE WISELY ◄`;
+}
+
+function pick(idx){
+  const scores=QUESTIONS[currentQ].opts[idx].scores;
+  Object.keys(scores).forEach(k=>{ answers[k]=(answers[k]||0)+scores[k]; });
+  document.querySelectorAll('.opt').forEach((b,i)=>{ if(i===idx)b.classList.add('selected'); b.style.pointerEvents='none'; });
+  setTimeout(()=>{ currentQ++; currentQ<QUESTIONS.length?renderQuestion():triggerDrama(); },350);
+}
+
+function triggerDrama(){
+  const key=Object.keys(answers).reduce((a,b)=>answers[a]>answers[b]?a:b);
+  resultKey=key;
+  const drama=document.getElementById('drama');
+  drama.classList.add('active');
+  const dc=document.getElementById('dramaCanvas');
+  dc.width=96; dc.height=120;
+  drawSilhouette(dc,key);
+  let litCount=0;
+  const pips=document.querySelectorAll('.drama-pip');
+  const pipIv=setInterval(()=>{ if(litCount<pips.length){pips[litCount].classList.add('lit');litCount++;} },280);
+  const msgs=[
+    ['SCANNING VIBE...','cross-referencing chaos index'],
+    ['CHECKING COMMITS...','looking for asdfgh patterns'],
+    ['CALCULATING...','measuring caffeine vs sleep ratio'],
+    ['ARCHETYPE FOUND!','brace yourself...']
+  ];
+  let step=0;
+  const msgIv=setInterval(()=>{
+    if(step<msgs.length){ document.getElementById('dramaLine1').textContent=msgs[step][0]; document.getElementById('dramaLine2').textContent=msgs[step][1]; step++; }
+    else { clearInterval(msgIv); clearInterval(pipIv); drama.classList.remove('active'); showResult(key); }
+  },700);
+}
+
+function showResult(key){
+  const arch=ARCHETYPES[key];
+  document.getElementById('quizView').style.display='none';
+  document.getElementById('revealView').style.display='block';
+  const hc=document.getElementById('habboCanvas');
+  hc.style.width='128px'; hc.style.height='140px';
+  drawAvatar(hc,key);
+  document.getElementById('revealName').textContent=arch.name;
+  document.getElementById('revealTypes').innerHTML=arch.types.map(t=>`<span class="tbadge ${t.c}">${t.l}</span>`).join('');
+  document.getElementById('revealDesc').textContent=arch.desc;
+  document.getElementById('revealCatch').textContent=arch.catchphrase;
+  document.getElementById('revealStats').innerHTML=arch.stats.map(s=>`<div class="stat-item"><div class="stat-name">${s.n}</div><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:0%" data-val="${s.v}"></div></div></div>`).join('');
+  document.getElementById('scanLine').textContent=`► ${arch.label.toUpperCase()} UNLOCKED ◄`;
+  setTimeout(()=>{ document.querySelectorAll('.stat-bar-fill').forEach(el=>{ el.style.width=el.dataset.val+'%'; }); },300);
+}
+
+function getShareText(){
+  const arch=ARCHETYPES[resultKey];
+  const pageUrl=window.location.href;
+  return `I just took the Vibe Coder Archetype quiz 🎮\n\nI'm ${arch.label.toUpperCase()} ${arch.types[0].c==='t-vibe'?'✨':'💥'}\n\n${arch.catchphrase}\n\nWhat's yours? → ${pageUrl}\n\n#VibeCoder #BuildInPublic`;
+}
+
+function shareTwitter(){
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText())}`,'_blank');
+}
+function shareLinkedIn(){
+  window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(getShareText())}`,'_blank');
+}
+function copyText(){
+  navigator.clipboard.writeText(getShareText()).then(()=>{
+    const t=document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2200);
+  });
+}
+function retry(){
+  answers={};currentQ=0;resultKey=null;
+  document.querySelectorAll('.drama-pip').forEach(p=>p.classList.remove('lit'));
+  document.getElementById('revealView').style.display='none';
+  document.getElementById('quizView').style.display='block';
+  renderQuestion();
+}
+
+renderQuestion();
+</script>
+</body>
+</html>

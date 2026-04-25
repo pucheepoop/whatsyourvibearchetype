@@ -653,28 +653,28 @@ const QUESTIONS = [
 const ARCHETYPES = {
   whisperer:{name:"THE PROMPT\nWHISPERER",label:"The Prompt Whisperer",
     types:[{l:"VIBE",c:"t-vibe"},{l:"GHOST",c:"t-ghost"}],
-    desc:"You don't write code. You SUMMON it. Claude is your co-founder, therapist and senior engineer. Your GitHub is 90% .txt files named 'mega_prompt_FINAL_v7_use_THIS_one'. You haven't touched a for-loop in months and your app still works better than people who cried over it.",
-    catchphrase:'"I told Claude to write the backend. It did. We move."',
+    desc:"You haven't written actual code since March. Claude is your unpaid CTO, your rubber duck, and your therapist. Your GitHub is just a graveyard of .txt files called 'FINAL_prompt_v9_USE_THIS.txt'. Somehow your app works better than people who actually tried.",
+    catchphrase:'"Why would I write it when I can just ask nicely?"',
     stats:[{n:"VIBE PWR",v:98},{n:"CHAOS IDX",v:40},{n:"SHIP RATE",v:75},{n:"CAFFEINE",v:28}]},
   chaos:{name:"THE CHAOS\nDEPLOYER",label:"The Chaos Deployer",
     types:[{l:"CHAOS",c:"t-chaos"},{l:"DRAGON",c:"t-dragon"}],
-    desc:"You push to prod the way other people breathe — constantly, without thinking. Tests are suggestions. Rollbacks are for cowards. You once hotfixed a live database mid-call and called it a vibe. The scary part? It worked. It always works. You are statistically cursed with luck.",
-    catchphrase:'"It worked on my machine. That IS production."',
+    desc:"You treat production like a sandbox and users like beta testers who didn't sign up for this. No tests. No staging. No regrets. You once pushed a hotfix mid-standup, muted yourself, and came back 3 mins later like nothing happened. It worked. It always works. This is getting dangerous.",
+    catchphrase:'"Tests are just code that tells you what you already broke."',
     stats:[{n:"VIBE PWR",v:60},{n:"CHAOS IDX",v:99},{n:"SHIP RATE",v:96},{n:"CAFFEINE",v:88}]},
   aesthetic:{name:"THE AESTHETIC\nARCHITECT",label:"The Aesthetic Architect",
     types:[{l:"ICE",c:"t-ice"},{l:"VIBE",c:"t-vibe"}],
-    desc:"Your app is a visual masterpiece that does approximately nothing. You spent 6 hours on a hover state 3 people will ever see. You've redesigned the landing page 4 times this sprint. Shipping feels like vandalism. You will never release anything. But what you have is BEAUTIFUL.",
-    catchphrase:'"The border-radius is 1px off. I cannot in good conscience ship this."',
+    desc:"You have spent more time on your loading spinner than most people spend on their entire app. It's not done until it's PERFECT. The button shadow is wrong. The font weight is wrong. Everything is wrong. You will fix it. You will never ship. The Dribbble shot will be immaculate.",
+    catchphrase:'"It\'s not a bug, it\'s a kerning issue. I\'ll fix it tonight."',
     stats:[{n:"VIBE PWR",v:97},{n:"CHAOS IDX",v:15},{n:"SHIP RATE",v:9},{n:"CAFFEINE",v:50}]},
   goblin:{name:"THE CONTEXT\nGOBLIN",label:"The Context Goblin",
     types:[{l:"DARK",c:"t-dark"},{l:"ZAP",c:"t-zap"}],
-    desc:"Token limits are a conspiracy you choose not to believe. You paste the entire repo, the README, three Stack Overflow threads and your Slack history into every prompt. Your Claude conversations look like crime scene evidence boards. And yet — it works. Because you gave context nobody else was unhinged enough to send.",
-    catchphrase:'"Let me paste the whole repo real quick. And the Slack history. And my notes app."',
+    desc:"Token limits are a myth invented by people who lack commitment. You paste the entire codebase, 4 error logs, 2 Stack Overflow threads, and a voice memo you recorded in the shower — and you STILL add 'please be concise' at the end. Unhinged. Effective. Somehow always right.",
+    catchphrase:'"Here\'s the full repo. Read all of it. I\'ll wait."',
     stats:[{n:"VIBE PWR",v:72},{n:"CHAOS IDX",v:52},{n:"SHIP RATE",v:62},{n:"CAFFEINE",v:82}]},
   iterator:{name:"THE INFINITE\nITERATOR",label:"The Infinite Iterator",
     types:[{l:"FLOW",c:"t-flow"},{l:"GRIND",c:"t-grind"}],
-    desc:"Everything is 95% done. Nothing is shipped. You have 14 side projects, 200 browser tabs, and a Notion board that would make a therapist weep. Every time it's almost ready you see one more thing. One more refactor. The app is perfect inside your head and that is exactly where it will stay.",
-    catchphrase:'"It\'s basically done. I just need to clean up the code first."',
+    desc:"The app has been 'almost done' since Q1. You have 200 tabs open, 14 side projects, and a Notion board with 'SHIP IT' written in bold that you have been ignoring for 6 weeks. Every refactor reveals a deeper refactor. You are not procrastinating. You have STANDARDS. Touch grass.",
+    catchphrase:'"Just one more cleanup and it\'s ready. I said this in January."',
     stats:[{n:"VIBE PWR",v:82},{n:"CHAOS IDX",v:30},{n:"SHIP RATE",v:7},{n:"CAFFEINE",v:72}]}
 };
 
@@ -743,11 +743,11 @@ function showResult(key){
 const SITE_URL = 'https://pucheepoop.github.io/whatsyourvibearchetype/';
 
 const SHARE_OPENERS = {
-  whisperer: "I don't write code. I summon it. 🧙",
-  chaos:     "I push to prod the way other people breathe. 💥",
-  aesthetic: "My app is a visual masterpiece that does nothing. ✨",
-  goblin:    "Token limits are a conspiracy I choose not to believe. 🪄",
-  iterator:  "Everything is 95% done. Nothing is shipped. 🔄"
+  whisperer: "I haven't written actual code since March and my app still works. 🧙",
+  chaos:     "I push to prod the way other people breathe. No tests. No regrets. 💥",
+  aesthetic: "My loading spinner took 6 hours. The app does nothing. It looks incredible. ✨",
+  goblin:    "I pasted my entire codebase + a voice memo into Claude and I regret nothing. 🪄",
+  iterator:  "The app has been almost done since Q1. I have STANDARDS. 🔄"
 };
 
 function getShareText(platform){

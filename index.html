@@ -204,7 +204,9 @@ body {
 .sb-tw { background: #1DA1F2; color: #fff; border-color: #0d8fd8; }
 .sb-li { background: #0077b5; color: #fff; border-color: #005f8a; }
 .sb-cp { background: #9bbc0f; color: #1a3a0a; border-color: #4a6a05; }
+.sb-save { background: #ffd700; color: #1a1a00; border-color: #aa9000; }
 .sb-retry { background: transparent; color: #9bbc0f; border-color: #9bbc0f; }
+.save-hint { font-family: 'VT323', monospace; font-size: 12px; color: #4a6a05; text-align: center; margin-top: 6px; line-height: 1.5; }
 
 /* GAMEBOY CONTROLS */
 .hinge { height: 8px; background: #aa0000; margin: 10px 0; display: flex; align-items: center; padding: 0 20px; gap: 8px; position: relative; z-index: 1; }
@@ -233,14 +235,35 @@ body {
 @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 
 /* FOOTER */
-.footer {
-  margin-top: 20px;
-  font-size: 6px;
-  color: #4a6a05;
-  text-align: center;
-  line-height: 2.5;
-}
+.footer { margin-top: 20px; font-size: 6px; color: #4a6a05; text-align: center; line-height: 2.5; }
 .footer a { color: #9bbc0f; text-decoration: none; }
+
+/* WELCOME SCREEN */
+.welcome-view { display: flex; flex-direction: column; align-items: center; height: 100%; }
+.welcome-stage {
+  position: relative; width: 100%; height: 168px;
+  background: #8bac0f; border-bottom: 2px solid #4a6a05;
+  overflow: hidden; flex-shrink: 0;
+}
+.welcome-stage::after {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 3px);
+  pointer-events: none;
+}
+.w-avatar { position: absolute; bottom: 8px; image-rendering: pixelated; }
+.welcome-body { padding: 10px 12px 8px; width: 100%; }
+.welcome-title { font-size: 8px; color: #1a3a0a; text-align: center; margin-bottom: 6px; line-height: 1.9; }
+.welcome-sub { font-family: 'VT323', monospace; font-size: 14px; color: #4a6a05; text-align: center; margin-bottom: 10px; line-height: 1.4; }
+.welcome-start-btn {
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  background: #1a3a0a; color: #9bbc0f;
+  border: 2px solid #4a6a05; padding: 10px 0; cursor: pointer;
+  width: 100%; border-radius: 2px; letter-spacing: 1px;
+  animation: startPulse 1s ease-in-out infinite alternate;
+  transition: background .15s;
+}
+.welcome-start-btn:hover { background: #2a5a14; }
+@keyframes startPulse { from { box-shadow: 0 0 0 rgba(155,188,15,0); } to { box-shadow: 0 0 10px rgba(155,188,15,0.35); } }
 </style>
 </head>
 <body>
@@ -275,8 +298,20 @@ body {
         <div class="drama-line2" id="dramaLine2">loading vibe data</div>
       </div>
 
+      <!-- WELCOME -->
+      <div id="welcomeView" class="welcome-view">
+        <div class="welcome-stage" id="welcomeStage">
+          <!-- avatars injected by JS -->
+        </div>
+        <div class="welcome-body">
+          <div class="welcome-title">WHAT KIND OF<br>VIBE CODER ARE YOU?</div>
+          <div class="welcome-sub">5 questions. brutal honesty.<br>zero chill. 100% you.<br>5 archetypes. which one is it?</div>
+          <button class="welcome-start-btn" onclick="startQuiz()">▶ PRESS START</button>
+        </div>
+      </div>
+
       <!-- QUIZ -->
-      <div id="quizView">
+      <div id="quizView" style="display:none;">
         <div class="progress-bar" id="progressBar"></div>
         <div id="questionArea"></div>
       </div>
@@ -298,11 +333,13 @@ body {
         <div class="share-area">
           <div class="share-label">► SHARE YOUR ARCHETYPE</div>
           <div class="share-btns">
+            <button class="share-btn sb-save" onclick="saveCard()">⬇ SAVE CARD</button>
             <button class="share-btn sb-tw" onclick="shareTwitter()">𝕏 TWEET IT</button>
             <button class="share-btn sb-li" onclick="shareLinkedIn()">in POST IT</button>
             <button class="share-btn sb-cp" onclick="copyText()">⎘ COPY TEXT</button>
             <button class="share-btn sb-retry" onclick="retry()">↺ RETRY</button>
           </div>
+          <div class="save-hint">★ save card first → attach image when posting to linkedin</div>
         </div>
       </div>
 
@@ -756,11 +793,193 @@ function retry(){
   answers={};currentQ=0;resultKey=null;
   document.querySelectorAll('.drama-pip').forEach(p=>p.classList.remove('lit'));
   document.getElementById('revealView').style.display='none';
+  document.getElementById('quizView').style.display='none';
+  document.getElementById('welcomeView').style.display='flex';
+  document.getElementById('scanLine').textContent='► WHAT KIND OF VIBE CODER ARE YOU? ◄';
+  initWelcome();
+}
+
+// ── CARD GENERATOR ───────────────────────────────────────────────────────────
+function saveCard(){
+  const arch = ARCHETYPES[resultKey];
+  const CW=600, CH=400;
+  const c=document.createElement('canvas');
+  c.width=CW; c.height=CH;
+  const ctx=c.getContext('2d');
+  ctx.imageSmoothingEnabled=false;
+
+  // Background + grid
+  ctx.fillStyle='#1a1a2e'; ctx.fillRect(0,0,CW,CH);
+  ctx.strokeStyle='rgba(155,188,15,0.06)'; ctx.lineWidth=1;
+  for(let x=0;x<CW;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,CH);ctx.stroke();}
+  for(let y=0;y<CH;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(CW,y);ctx.stroke();}
+
+  // Left panel — GB screen
+  const pX=20,pY=20,pW=230,pH=360;
+  ctx.fillStyle='#0d1a00'; ctx.fillRect(pX,pY,pW,pH);
+  ctx.strokeStyle='#4a6a05'; ctx.lineWidth=3; ctx.strokeRect(pX,pY,pW,pH);
+  ctx.fillStyle='#8bac0f'; ctx.fillRect(pX+10,pY+10,pW-20,pH-20);
+  ctx.fillStyle='rgba(0,0,0,0.07)';
+  for(let y=pY+10;y<pY+pH-10;y+=3){ctx.fillRect(pX+10,y,pW-20,1);}
+
+  // Avatar
+  const avc=document.createElement('canvas');
+  avc.width=26*S; avc.height=40*S;
+  drawAvatar(avc,resultKey);
+  const aW=(26*S)*0.8, aH=(40*S)*0.8;
+  const aX=pX+(pW-aW)/2, aY=pY+18;
+  ctx.drawImage(avc,aX,aY,aW,aH);
+  ctx.fillStyle='rgba(26,58,10,0.3)';
+  ctx.beginPath();ctx.ellipse(pX+pW/2,aY+aH+5,aW*0.28,5,0,0,Math.PI*2);ctx.fill();
+
+  // Name in panel
+  ctx.fillStyle='#1a3a0a'; ctx.font='bold 8px "Press Start 2P",monospace'; ctx.textAlign='center';
+  arch.name.split('\n').forEach((ln,i)=>ctx.fillText(ln,pX+pW/2,aY+aH+22+i*15));
+
+  // Type badges
+  const typeColors={'t-chaos':'#f08030','t-flow':'#6890f0','t-grind':'#78c850','t-zap':'#c8a000','t-vibe':'#f85888','t-dark':'#705848','t-ghost':'#705898','t-dragon':'#7038f8','t-ice':'#5aabab'};
+  const bY=aY+aH+22+arch.name.split('\n').length*15+6;
+  const totW=arch.types.length*62+(arch.types.length-1)*5;
+  let bx=pX+(pW-totW)/2;
+  arch.types.forEach(t=>{
+    ctx.fillStyle=typeColors[t.c]||'#666'; ctx.fillRect(bx,bY,62,15);
+    ctx.fillStyle=['t-grind','t-zap','t-ice'].includes(t.c)?'#1a3a0a':'#fff';
+    ctx.font='5px "Press Start 2P",monospace'; ctx.textAlign='center';
+    ctx.fillText(t.l,bx+31,bY+10); bx+=67;
+  });
+
+  // Right side
+  const rx=272, ry=28;
+  ctx.fillStyle='#4a6a05'; ctx.font='6px "Press Start 2P",monospace'; ctx.textAlign='left';
+  ctx.fillText('★ VIBEDEX v3.0 — CODER QUIZ',rx,ry+10);
+  ctx.fillStyle='#9bbc0f'; ctx.font='9px "Press Start 2P",monospace';
+  arch.name.split('\n').forEach((ln,i)=>ctx.fillText(ln,rx,ry+32+i*16));
+  const divY=ry+32+arch.name.split('\n').length*16+8;
+  ctx.strokeStyle='#2a4a10'; ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(rx,divY);ctx.lineTo(CW-18,divY);ctx.stroke();
+
+  // Stats
+  const statCols=['#f08030','#e84040','#4488ff','#9b59b6','#8B6914'];
+  const sY=divY+14;
+  arch.stats.forEach((s,i)=>{
+    const sy=sY+i*30;
+    const barX=rx+104, barW=CW-barX-50;
+    ctx.fillStyle='#5a8a2a'; ctx.font='5px "Press Start 2P",monospace'; ctx.textAlign='left';
+    ctx.fillText(s.n,rx,sy+7);
+    ctx.fillStyle='#0d2200'; ctx.fillRect(barX,sy-2,barW,9);
+    ctx.fillStyle=statCols[i]; ctx.fillRect(barX,sy-2,barW*(s.v/100),9);
+    ctx.fillStyle='#9bbc0f'; ctx.font='5px "Press Start 2P",monospace'; ctx.textAlign='right';
+    ctx.fillText(s.v,CW-20,sy+7);
+  });
+
+  // Catchphrase
+  const cpY=sY+arch.stats.length*30+12;
+  ctx.fillStyle='#2a5a14'; ctx.fillRect(rx,cpY,3,44);
+  ctx.fillStyle='#c8e06a'; ctx.font='14px "VT323",monospace'; ctx.textAlign='left';
+  const words=arch.catchphrase.split(' ');
+  let ln='', lnY=cpY+14, maxW=CW-rx-28;
+  words.forEach(w=>{
+    const test=ln+w+' ';
+    if(ctx.measureText(test).width>maxW&&ln){ctx.fillText(ln.trim(),rx+8,lnY);ln=w+' ';lnY+=15;}
+    else ln=test;
+  });
+  if(ln.trim())ctx.fillText(ln.trim(),rx+8,lnY);
+
+  // URL footer
+  ctx.fillStyle='#3a5a15'; ctx.font='6px "Press Start 2P",monospace'; ctx.textAlign='right';
+  ctx.fillText('pucheepoop.github.io/whatsyourvibearchetype',CW-18,CH-14);
+
+  // Corner brackets
+  const corners=[[22,22],[CW-22,22],[22,CH-22],[CW-22,CH-22]];
+  corners.forEach(([x,y])=>{
+    ctx.strokeStyle='rgba(155,188,15,0.4)'; ctx.lineWidth=2;
+    ctx.strokeRect(x-5,y-5,10,10);
+  });
+
+  // Download
+  const a=document.createElement('a');
+  a.download=`vibedex-${resultKey}.png`;
+  a.href=c.toDataURL('image/png');
+  a.click();
+  showToast('⬇ CARD SAVED! ATTACH IT TO YOUR POST.');
+}
+
+
+// ── WELCOME SCREEN ────────────────────────────────────────────────────────────
+const AVATAR_KEYS = ['whisperer','chaos','aesthetic','goblin','iterator'];
+const DANCE_CONFIG = {
+  whisperer: { speed:0.022, amp:11, phase:0.0, scale:0.68 },
+  chaos:     { speed:0.034, amp:14, phase:1.1, scale:0.64 },
+  aesthetic: { speed:0.018, amp:9,  phase:2.3, scale:0.70 },
+  goblin:    { speed:0.028, amp:13, phase:0.7, scale:0.66 },
+  iterator:  { speed:0.020, amp:10, phase:1.8, scale:0.68 },
+};
+let danceCanvases={}, danceT={}, danceRAF=null;
+
+function initWelcome(){
+  const stage=document.getElementById('welcomeStage');
+  stage.innerHTML='';
+  danceCanvases={};
+
+  // Pick 3 random archetypes each time
+  const three=[...AVATAR_KEYS].sort(()=>Math.random()-0.5).slice(0,3);
+  const stageW=stage.offsetWidth||460;
+  // Evenly space across stage: left, centre, right
+  const positions=[
+    Math.round(stageW*0.08),
+    Math.round(stageW*0.42),
+    Math.round(stageW*0.72),
+  ];
+
+  three.forEach((key,i)=>{
+    const cfg=DANCE_CONFIG[key];
+    const src=document.createElement('canvas');
+    src.width=26*S; src.height=40*S;
+    drawAvatar(src,key);
+    const dispW=Math.round(26*S*cfg.scale), dispH=Math.round(40*S*cfg.scale);
+    const xPos=positions[i];
+    const el=document.createElement('canvas');
+    el.width=dispW; el.height=dispH;
+    el.style.cssText=`position:absolute;bottom:8px;left:${xPos}px;image-rendering:pixelated;width:${dispW}px;height:${dispH}px;`;
+    el.getContext('2d').drawImage(src,0,0,dispW,dispH);
+    stage.appendChild(el);
+    const sh=document.createElement('div');
+    sh.style.cssText=`position:absolute;bottom:3px;left:${xPos+dispW*0.15}px;width:${dispW*0.7}px;height:5px;background:rgba(26,58,10,0.22);border-radius:50%;`;
+    stage.appendChild(sh);
+    danceCanvases[key]={el,sh,dispW,dispH,cfg};
+    danceT[key]=cfg.phase;
+  });
+  if(danceRAF)cancelAnimationFrame(danceRAF);
+  animateDance();
+}
+
+function animateDance(){
+  Object.keys(danceCanvases).forEach(key=>{
+    const d=danceCanvases[key]; if(!d)return;
+    danceT[key]+=d.cfg.speed;
+    const t=danceT[key];
+    const bounce=Math.sin(t)*d.cfg.amp;
+    const squashX=1+Math.sin(t*2)*0.04;
+    const squashY=1-Math.sin(t*2)*0.04;
+    d.el.style.transform=`translateY(${-bounce}px) scaleX(${squashX}) scaleY(${squashY})`;
+    d.el.style.transformOrigin='bottom center';
+    const ss=0.5+0.5*(1-(bounce/d.cfg.amp)*0.5);
+    d.sh.style.transform=`scaleX(${ss})`;
+    d.sh.style.opacity=0.12+0.15*ss;
+  });
+  danceRAF=requestAnimationFrame(animateDance);
+}
+
+function startQuiz(){
+  if(danceRAF){cancelAnimationFrame(danceRAF);danceRAF=null;}
+  document.getElementById('welcomeView').style.display='none';
   document.getElementById('quizView').style.display='block';
+  document.getElementById('scanLine').textContent='► Q1/5 — CHOOSE WISELY ◄';
   renderQuestion();
 }
 
-renderQuestion();
+// Boot: show welcome
+initWelcome();
 </script>
 </body>
 </html>

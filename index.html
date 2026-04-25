@@ -181,8 +181,9 @@ body {
 .t-ghost  { background: #705898; } .t-dragon { background: #7038f8; }
 .t-ice    { background: #5aabab; }
 
+.reveal-content { padding: 0 6px; }
 .reveal-desc { font-family: 'VT323', monospace; font-size: 15px; color: #1a3a0a; line-height: 1.4; margin-bottom: 6px; }
-.reveal-catch { font-family: 'VT323', monospace; font-size: 14px; color: #4a6a05; border-left: 3px solid #1a3a0a; padding-left: 6px; margin-bottom: 10px; }
+.reveal-catch { font-family: 'VT323', monospace; font-size: 14px; color: #4a6a05; border-left: 3px solid #1a3a0a; padding-left: 8px; margin-bottom: 10px; }
 
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px; }
 .stat-item { background: #c8e06a; border: 1.5px solid #1a3a0a; padding: 5px 7px; }
@@ -327,9 +328,11 @@ body {
           <div class="reveal-name" id="revealName"></div>
           <div class="type-row" id="revealTypes"></div>
         </div>
-        <div class="reveal-desc" id="revealDesc" style="margin-bottom:6px;"></div>
-        <div class="reveal-catch" id="revealCatch"></div>
-        <div class="stat-grid" id="revealStats"></div>
+        <div class="reveal-content">
+          <div class="reveal-desc" id="revealDesc"></div>
+          <div class="reveal-catch" id="revealCatch"></div>
+          <div class="stat-grid" id="revealStats"></div>
+        </div>
         <div class="share-area">
           <div class="share-label">► SHARE YOUR ARCHETYPE</div>
           <div class="share-btns">
@@ -653,28 +656,28 @@ const QUESTIONS = [
 const ARCHETYPES = {
   whisperer:{name:"THE PROMPT\nWHISPERER",label:"The Prompt Whisperer",
     types:[{l:"VIBE",c:"t-vibe"},{l:"GHOST",c:"t-ghost"}],
-    desc:"You haven't written actual code since March. Claude is your unpaid CTO, your rubber duck, and your therapist. Your GitHub is just a graveyard of .txt files called 'FINAL_prompt_v9_USE_THIS.txt'. Somehow your app works better than people who actually tried.",
-    catchphrase:'"Why would I write it when I can just ask nicely?"',
+    desc:"Your IDE is Claude. Your version control is chat history. You once shipped a full SaaS by saying 'make it better' 14 times. People ask how you built it so fast. You say 'hard work'. You have not written a for-loop since March.",
+    catchphrase:'"I bring Code to life with a mystical voice of charm and wit."',
     stats:[{n:"VIBE PWR",v:98},{n:"CHAOS IDX",v:40},{n:"SHIP RATE",v:75},{n:"CAFFEINE",v:28}]},
   chaos:{name:"THE CHAOS\nDEPLOYER",label:"The Chaos Deployer",
     types:[{l:"CHAOS",c:"t-chaos"},{l:"DRAGON",c:"t-dragon"}],
-    desc:"You treat production like a sandbox and users like beta testers who didn't sign up for this. No tests. No staging. No regrets. You once pushed a hotfix mid-standup, muted yourself, and came back 3 mins later like nothing happened. It worked. It always works. This is getting dangerous.",
-    catchphrase:'"Tests are just code that tells you what you already broke."',
+    desc:"You have never written a test in your life and your uptime is somehow 99.8%. You push to prod like it owes you money. Staging is a myth. Rollbacks are for people who made mistakes. You do not make mistakes. You make incidents and then fix them faster than anyone expected.",
+    catchphrase:'"Ship first, what could go wrong? If it does, Skynet would have hunted me down by now."',
     stats:[{n:"VIBE PWR",v:60},{n:"CHAOS IDX",v:99},{n:"SHIP RATE",v:96},{n:"CAFFEINE",v:88}]},
   aesthetic:{name:"THE AESTHETIC\nARCHITECT",label:"The Aesthetic Architect",
     types:[{l:"ICE",c:"t-ice"},{l:"VIBE",c:"t-vibe"}],
-    desc:"You have spent more time on your loading spinner than most people spend on their entire app. It's not done until it's PERFECT. The button shadow is wrong. The font weight is wrong. Everything is wrong. You will fix it. You will never ship. The Dribbble shot will be immaculate.",
-    catchphrase:'"It\'s not a bug, it\'s a kerning issue. I\'ll fix it tonight."',
+    desc:"Your app has never been used by a real human but it has 847 Dribbble likes. You spent 11 hours on the empty state illustration. The button has 4 hover variants. You will redesign the landing page one more time. Then it will be ready. It will not be ready.",
+    catchphrase:'"They say I have OCD. I can\'t deny it — 0.5 pixels off drives me insane. Ever heard of a metal ruler?"',
     stats:[{n:"VIBE PWR",v:97},{n:"CHAOS IDX",v:15},{n:"SHIP RATE",v:9},{n:"CAFFEINE",v:50}]},
   goblin:{name:"THE CONTEXT\nGOBLIN",label:"The Context Goblin",
     types:[{l:"DARK",c:"t-dark"},{l:"ZAP",c:"t-zap"}],
-    desc:"Token limits are a myth invented by people who lack commitment. You paste the entire codebase, 4 error logs, 2 Stack Overflow threads, and a voice memo you recorded in the shower — and you STILL add 'please be concise' at the end. Unhinged. Effective. Somehow always right.",
-    catchphrase:'"Here\'s the full repo. Read all of it. I\'ll wait."',
+    desc:"You have sent Claude a 47,000 token prompt and then said 'be concise'. Your context window is a crime scene. You paste error logs, meeting notes, your ex's texts, and the entire repo — just in case. Unhinged. It always works. Nobody understands why.",
+    catchphrase:'"Context is everything. Wait till you see my diary."',
     stats:[{n:"VIBE PWR",v:72},{n:"CHAOS IDX",v:52},{n:"SHIP RATE",v:62},{n:"CAFFEINE",v:82}]},
   iterator:{name:"THE INFINITE\nITERATOR",label:"The Infinite Iterator",
     types:[{l:"FLOW",c:"t-flow"},{l:"GRIND",c:"t-grind"}],
-    desc:"The app has been 'almost done' since Q1. You have 200 tabs open, 14 side projects, and a Notion board with 'SHIP IT' written in bold that you have been ignoring for 6 weeks. Every refactor reveals a deeper refactor. You are not procrastinating. You have STANDARDS. Touch grass.",
-    catchphrase:'"Just one more cleanup and it\'s ready. I said this in January."',
+    desc:"The app will ship when it is perfect. It is never perfect. You have 19 branches, 200 open tabs, and a Notion doc called FINAL FINAL SHIP THIS.md that you have not opened since January. The code is clean. Your soul is not. One more refactor.",
+    catchphrase:'"I have the patience of a tree, but as fickle-minded as your ex."',
     stats:[{n:"VIBE PWR",v:82},{n:"CHAOS IDX",v:30},{n:"SHIP RATE",v:7},{n:"CAFFEINE",v:72}]}
 };
 
@@ -743,11 +746,11 @@ function showResult(key){
 const SITE_URL = 'https://pucheepoop.github.io/whatsyourvibearchetype/';
 
 const SHARE_OPENERS = {
-  whisperer: "I haven't written actual code since March and my app still works. 🧙",
-  chaos:     "I push to prod the way other people breathe. No tests. No regrets. 💥",
-  aesthetic: "My loading spinner took 6 hours. The app does nothing. It looks incredible. ✨",
-  goblin:    "I pasted my entire codebase + a voice memo into Claude and I regret nothing. 🪄",
-  iterator:  "The app has been almost done since Q1. I have STANDARDS. 🔄"
+  whisperer: 'I bring Code to life with a mystical voice of charm and wit. 🧙',
+  chaos:     'Ship first, what could go wrong? If it does, Skynet would have hunted me down by now. 💥',
+  aesthetic: 'They say I have OCD. 0.5 pixels off drives me insane. Ever heard of a metal ruler? ✨',
+  goblin:    'Context is everything. Wait till you see my diary. 🪄',
+  iterator:  'I have the patience of a tree, but as fickle-minded as your ex. 🔄'
 };
 
 function getShareText(platform){
@@ -848,42 +851,45 @@ function saveCard(){
     ctx.fillText(t.l,bx+31,bY+10); bx+=67;
   });
 
-  // Right side
-  const rx=272, ry=28;
+  // Right side — with 20px right margin
+  const rx=272, ry=28, rightEdge=CW-22;
   ctx.fillStyle='#4a6a05'; ctx.font='6px "Press Start 2P",monospace'; ctx.textAlign='left';
   ctx.fillText('★ VIBEDEX v3.0 — CODER QUIZ',rx,ry+10);
   ctx.fillStyle='#9bbc0f'; ctx.font='9px "Press Start 2P",monospace';
   arch.name.split('\n').forEach((ln,i)=>ctx.fillText(ln,rx,ry+32+i*16));
   const divY=ry+32+arch.name.split('\n').length*16+8;
   ctx.strokeStyle='#2a4a10'; ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(rx,divY);ctx.lineTo(CW-18,divY);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(rx,divY);ctx.lineTo(rightEdge,divY);ctx.stroke();
 
-  // Stats
+  // Stats — bar right edge respects 22px margin
   const statCols=['#f08030','#e84040','#4488ff','#9b59b6','#8B6914'];
   const sY=divY+14;
   arch.stats.forEach((s,i)=>{
     const sy=sY+i*30;
-    const barX=rx+104, barW=CW-barX-50;
+    const barX=rx+110, barW=rightEdge-barX-28;
     ctx.fillStyle='#5a8a2a'; ctx.font='5px "Press Start 2P",monospace'; ctx.textAlign='left';
     ctx.fillText(s.n,rx,sy+7);
     ctx.fillStyle='#0d2200'; ctx.fillRect(barX,sy-2,barW,9);
     ctx.fillStyle=statCols[i]; ctx.fillRect(barX,sy-2,barW*(s.v/100),9);
     ctx.fillStyle='#9bbc0f'; ctx.font='5px "Press Start 2P",monospace'; ctx.textAlign='right';
-    ctx.fillText(s.v,CW-20,sy+7);
+    ctx.fillText(s.v,rightEdge,sy+7);
   });
 
-  // Catchphrase
-  const cpY=sY+arch.stats.length*30+12;
-  ctx.fillStyle='#2a5a14'; ctx.fillRect(rx,cpY,3,44);
-  ctx.fillStyle='#c8e06a'; ctx.font='14px "VT323",monospace'; ctx.textAlign='left';
-  const words=arch.catchphrase.split(' ');
-  let ln='', lnY=cpY+14, maxW=CW-rx-28;
-  words.forEach(w=>{
-    const test=ln+w+' ';
-    if(ctx.measureText(test).width>maxW&&ln){ctx.fillText(ln.trim(),rx+8,lnY);ln=w+' ';lnY+=15;}
-    else ln=test;
+  // Catchphrase — two sentences, needs more height
+  const cpY=sY+arch.stats.length*30+14;
+  ctx.fillStyle='#2a5a14'; ctx.fillRect(rx,cpY,3,80);
+  ctx.fillStyle='#c8e06a'; ctx.font='16px "VT323",monospace'; ctx.textAlign='left';
+  const cpMaxW=rightEdge-rx-16;
+  const cpWords=arch.catchphrase.split(' ');
+  let cpLine='', cpLineY=cpY+16;
+  cpWords.forEach(w=>{
+    const test=cpLine+w+' ';
+    if(ctx.measureText(test).width>cpMaxW && cpLine){
+      ctx.fillText(cpLine.trim(),rx+10,cpLineY);
+      cpLine=w+' '; cpLineY+=18;
+    } else { cpLine=test; }
   });
-  if(ln.trim())ctx.fillText(ln.trim(),rx+8,lnY);
+  if(cpLine.trim()) ctx.fillText(cpLine.trim(),rx+10,cpLineY);
 
   // URL footer
   ctx.fillStyle='#3a5a15'; ctx.font='6px "Press Start 2P",monospace'; ctx.textAlign='right';
